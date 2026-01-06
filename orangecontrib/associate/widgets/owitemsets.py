@@ -217,6 +217,7 @@ class OWItemsets(widget.OWWidget):
     @gui.deferred
     def find_itemsets(self):
         if self.data is None or not len(self.data):
+            self.tree.clear()
             return
         if self._is_running:
             self._is_running = False
@@ -316,26 +317,22 @@ class OWItemsets(widget.OWWidget):
     @Inputs.data
     def set_data(self, data):
         self.data = data
-        is_error = False
+        self.output = None
+        self.X = None
+        self.Warning.cont_attrs.clear()
+        self.Error.no_disc_features.clear()
         if data is not None:
-            self.Warning.cont_attrs.clear()
-            self.Error.no_disc_features.clear()
-            self.button.setDisabled(False)
             self.X = data.X
             if issparse(data.X):
                 self.X = data.X.tocsc()
             else:
                 if not data.domain.has_discrete_attributes():
+                    self.data = self.X = None  # invalidate input
                     self.Error.no_disc_features()
-                    is_error = True
-                    self.button.setDisabled(True)
                 elif data.domain.has_continuous_attributes():
                     self.Warning.cont_attrs()
-        else:
-            self.output = None
-            self.commit.now()
-        if not is_error:
-            self.find_itemsets.now()
+        self.find_itemsets.now()
+        self.commit.now()
 
     @classmethod
     def migrate_settings(cls, settings, _):
