@@ -153,6 +153,7 @@ from collections import defaultdict
 from collections.abc import Iterator
 from itertools import combinations, chain
 from functools import reduce
+import warnings
 
 import numpy as np
 from scipy.sparse import issparse, spmatrix
@@ -205,7 +206,8 @@ try:
 except ImportError:
     # The module may not have been compiled due to compiler missing (e.g. on WinDOS);
     # just use above Python code
-    pass
+    warnings.warn("_fpgrowth C extension not available. "
+                  "Pure Python (slow) version will be used instead.")
 
 
 def _fp_tree_insert(item, T, node_links, count):

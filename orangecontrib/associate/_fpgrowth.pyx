@@ -30,7 +30,7 @@ cpdef itemsets_t bucketing_count(list db,
         hashmap[int, int] fwd_map = hashmap[int, int]()
         int index = 0
 
-        vector[int] buckets = vector[int](2**k, 0)
+        vector[int] buckets = vector[int](int(2**k), 0)
         pair[int, vector[int]] transaction
         int tid = 0
         int item

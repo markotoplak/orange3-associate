@@ -2,6 +2,7 @@
 
 from setuptools import setup, find_packages
 from distutils.extension import Extension
+from Cython.Build import cythonize
 from os import path
 
 VERSION = '1.3.0'
@@ -56,9 +57,9 @@ def do_setup(ext_modules):
         },
         entry_points=ENTRY_POINTS,
         install_requires=[
-            'numpy',
-            'scipy',
-            'Orange3>=3.33.0'
+            'numpy>=1.24.0',
+            'scipy>=1.10.0',
+            'Orange3>=3.38.0'
         ],
         extras_require={
             'test': ['pytest', 'coverage'],
@@ -84,13 +85,13 @@ def do_setup(ext_modules):
 
 if __name__ == '__main__':
     ext_modules=[
-        Extension("orangecontrib.associate._fpgrowth",
-                  sources=[path.sep.join(("orangecontrib", "associate", "_fpgrowth.cpp"))],
-                  extra_compile_args=["-std=c++11", "-O3"],
-                  language="c++",)
+        Extension(
+            "orangecontrib.associate._fpgrowth",
+            ["orangecontrib/associate/_fpgrowth.pyx"],
+        )
     ]
     try:
-        do_setup(ext_modules)
+        do_setup(cythonize(ext_modules))
     except:  # fails if no compiler present, e.g. on WinDOS
         import sys
         print('WARNING: Falling back to NOT compiling extension modules. '
