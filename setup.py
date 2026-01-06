@@ -56,9 +56,9 @@ def do_setup(ext_modules):
         },
         entry_points=ENTRY_POINTS,
         install_requires=[
-            'numpy',
-            'scipy',
-            'Orange3>=3.33.0'
+            'numpy>=1.24.0',
+            'scipy>=1.9',
+            'Orange3>=3.35.0'
         ],
         extras_require={
             'test': ['pytest', 'coverage'],
