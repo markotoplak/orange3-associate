@@ -90,13 +90,12 @@ class OWItemsets(widget.OWWidget):
             box, self, 'minSupport',
             values=self.support_options,
             label='Minimal support:', labelFormat="%g%%",
-            callback=lambda: self.find_itemsets())
+            callback=lambda: self.find_itemsets.deferred())
         gui.hSlider(box, self, 'maxItemsets', minValue=10000, maxValue=100000, step=10000,
                     label='Max. number of itemsets:', labelFormat="%d",
-                    callback=lambda: self.find_itemsets())
+                    callback=lambda: self.find_itemsets.deferred())
         self.button = gui.auto_commit(
-            box, self, 'autoFind', 'Find Itemsets', commit=self.find_itemsets,
-            callback=lambda: self.autoFind and self.find_itemsets())
+            box, self, 'autoFind', 'Find Itemsets', commit=self.find_itemsets)
 
         box = gui.widgetBox(self.controlArea, 'Filter itemsets')
         gui.lineEdit(box, self, 'filterKeywords', 'Contains:',
@@ -174,8 +173,9 @@ class OWItemsets(widget.OWWidget):
         self.nSelectedExamples = len(instances)
         self.nSelectedItemsets = nSelectedItemsets
         self.output = self.data[sorted(instances)] or None
-        self.commit()
+        self.commit.deferred()
 
+    @gui.deferred
     def commit(self):
         self.Outputs.matching_data.send(self.output)
 
@@ -214,6 +214,7 @@ class OWItemsets(widget.OWWidget):
                 self = self.parent()
             return '\n'.join(reversed(tooltip))
 
+    @gui.deferred
     def find_itemsets(self):
         if self.data is None or not len(self.data):
             return
@@ -332,9 +333,9 @@ class OWItemsets(widget.OWWidget):
                     self.Warning.cont_attrs()
         else:
             self.output = None
-            self.commit()
-        if self.autoFind and not is_error:
-            self.find_itemsets()
+            self.commit.now()
+        if not is_error:
+            self.find_itemsets.now()
 
     @classmethod
     def migrate_settings(cls, settings, _):
